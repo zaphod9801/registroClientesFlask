@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Lista de clientes</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Ciudad</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+        <tr>
+            <td>{{ client.cod }}</td>
+            <td>{{ client.name }}</td>
+            <td>{{ client.city_cod }}</td>
+            <td>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#{{loop.index}}editClientModal">
+                    Editar Cliente
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id="{{loop.index}}editClientModal" tabindex="-1" role="dialog"
+                    aria-labelledby="{{loop.index}}editClientModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="{{loop.index}}editClientModalLabel">Editar Cliente</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="{{ url_for('clients_edit', cod=client.cod) }}"
+                                    id="editClientForm">
+                                    <div class="form-group">
+                                        <label for="name">Nombre</label>
+                                        <input type="text" class="form-control" id="name" name="name"
+                                            value="{{client.name}}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="city">Ciudad</label>
+                                        <select class="form-control" id="city" name="city_cod">
+                                            {% for city in cities %}
+                                            <option value="{{ city.cod }}">{{ city.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Cerrar</button>
+                                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                                    </div>
+                                </form>
+                                <script>
+                                    $(document).ready(function () {
+                                        $("#editClientForm").submit(function (e) {
+                                            e.preventDefault();
+
+                                            var form = $(this);
+                                            var url = form.attr('action');
+
+                                            $.ajax({
+                                                type: "POST",
+                                                url: url,
+                                                data: form.serialize(),
+                                                success: function (data) {
+                                                    $('#{{loop.index}}editClientModal').modal('hide');
+                                                    // Actualiza la lista de clientes
+                                                    // Esto podría implicar volver a hacer una solicitud AJAX para obtener la lista actualizada de clientes
+                                                },
+                                                error: function () {
+                                                    alert('Hubo un error al editar el cliente');
+                                                }
+                                            });
+                                        });
+                                    });
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form action="{{ url_for('clients_delete', cod=client.cod) }}" method="post">
+                    <button type="submit">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+
+        <!-- Botón para activar el modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#clientModal">
+            Añadir Cliente
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="clientModal" tabindex="-1" role="dialog" aria-labelledby="clientModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="clientModalLabel">Nuevo Cliente</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="{{ url_for('clients_create') }}" id="clientForm">
+                            <div class="form-group">
+                                <label for="name">Nombre</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">Ciudad</label>
+                                <select class="form-control" id="city" name="city_cod">
+                                    {% for city in cities %}
+                                    <option value="{{ city.cod }}">{{ city.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                            </div>
+                        </form>
+                        <script>
+                            $(document).ready(function () {
+                                $("#clientForm").submit(function (e) {
+                                    e.preventDefault();
+
+                                    var form = $(this);
+                                    var url = form.attr('action');
+
+                                    $.ajax({
+                                        type: "POST",
+                                        url: url,
+                                        data: form.serialize(),
+                                        success: function (data) {
+                                            // Cierra el modal
+                                            $('#clientModal').modal('hide');
+                                            // Actualiza la lista de clientes
+                                            // Esto podría implicar volver a hacer una solicitud AJAX para obtener la lista actualizada de clientes
+                                        },
+                                        error: function () {
+                                            alert('Hubo un error al añadir el cliente');
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </tbody>
+</table>
+{% endblock %}

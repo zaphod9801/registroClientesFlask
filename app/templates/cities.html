@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block content %}
+<center>
+    <h1 class="display-6">Lista de Ciudades</h1>
+</center>
+<div class="container-sm">
+    <table id="citiesTable" class="table table-hover">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="listCities">
+            {% for city in cities.items %}
+            <tr id="city-{{ city.cod }}-details">
+                <td id="city-{{ city.cod }}-cod">{{ city.cod }}</td>
+                <td id="city-{{ city.cod }}-name">{{ city.name }}</td>
+                <td>
+                    <!-- Aquí vamos a poner los botones de editar y eliminar -->
+                    <button type="button" class="btn btn-primary btn-md rounded-5" data-bs-toggle="modal"
+                        data-bs-target="#editCityModal-{{ city.cod }}" title="Editar Ciudad">
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <!-- Modal editar  -->
+                    <div class="modal fade" id="editCityModal-{{city.cod}}" tabindex="-1" role="dialog"
+                        aria-labelledby="editCityModal-{{city.cod}}Label" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editCityModal-{{city.cod}}Label">Editar Ciudad</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="edit-city-form" method="POST"
+                                        action="{{ url_for('cities_edit', cod=city.cod) }}"
+                                        id="editCityForm-{{ city.cod }}">
+                                        <div class="form-group">
+                                            <label for="name">Nombre</label>
+                                            <input type="text" class="form-control" id="name" name="name"
+                                                value="{{city.name}}" required>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Cerrar</button>
+                                            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-danger btn-md rounded-5" data-bs-toggle="modal"
+                        data-bs-target="#deleteCityModal-{{ city.cod }}" title="Eliminar Ciudad">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                    <!-- Modal eliminar-->
+                    <div class="modal fade" id="deleteCityModal-{{city.cod}}" tabindex="-1" role="dialog"
+                        aria-labelledby="deleteCityModal-{{city.cod}}Label" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteCityModal-{{city.cod}}Label">Eliminar Ciudad
+                                    </h5>
+                                </div>
+                                <div class="modal-body">
+                                    ¿Seguro que desea eliminar esta ciudad?
+                                    <form class="delete-city-form" method="POST"
+                                        action="{{ url_for('cities_delete', cod=city.cod) }}"
+                                        id="deleteCityForm-{{ city.cod }}">
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-primary">Eliminar ciudad</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Función para el modal para eliminar ciudad-->
+    <script>
+        $(document).on('submit', '.delete-city-form', function (e) {
+            e.preventDefault();
+
+            var form = $(this);
+            var url = form.attr('action');
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: form.serialize(),
+                success: function (data) {
+                    $(`#deleteCityModal-${data.city.cod}`).modal('hide');
+                    $(`#city-${data.city.cod}-details`).remove()
+                },
+                error: function () {
+                    alert('Hubo un error al eliminar la ciudad');
+                }
+            });
+        });
+    </script>
+    <!-- Función para el modal para editar ciudad-->
+    <script>
+        $(document).on('submit', '.edit-city-form', function (e) {
+            e.preventDefault();
+
+            var form = $(this);
+            var url = form.attr('action');
+
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: form.serialize(),
+                success: function (data) {
+                    $(`#editCityModal-${data.city.cod}`).modal('hide');
+                    $(`#city-${data.city.cod}-name`).text(data.city.name);
+                },
+                error: function () {
+                    alert('Hubo un error al editar la ciudad');
+                }
+            });
+        });
+
+
+    </script>
+
+    <!-- Botón para activar el modal -->
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#cityModal" style="font-size: 24px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;" title="Agregar ciudad">
+        <i class="bi bi-plus-lg"></i>
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="cityModal" tabindex="-1" role="dialog" aria-labelledby="cityModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cityModalLabel">Nueva Ciudad</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('cities_create') }}" id="cityForm">
+                        <div class="form-group">
+                            <label for="name">Nombre</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                        </div>
+                    </form>
+                    <script>
+                        $(document).ready(function () {
+                            $("#cityForm").submit(function (e) {
+                                e.preventDefault();
+
+                                var form = $(this);
+                                var url = form.attr('action');
+
+                                $.ajax({
+                                    type: "POST",
+                                    url: url,
+                                    data: form.serialize(),
+                                    success: function (data) {
+                                        // Cierra el modal
+                                        $('#cityModal').modal('hide');
+                                        var deleteUrl = "{{ delete_url }}";
+                                        var editUrl = "{{ edit_url }}";
+                                        // Actualiza la lista de ciudades
+                                        // Aquí añadimos la nueva ciudad a la tabla
+                                        var newRow = `<tr id="city-${data.city.cod}-details">
+                                                <td>${data.city.cod}</td>
+                                                <td id="city-${data.city.cod}-name">${data.city.name}</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-primary btn-md rounded-5" data-bs-toggle="modal"
+                                                        data-bs-target="#editCityModal-${data.city.cod}" title="Editar Ciudad">
+                                                        <i class="bi bi-pencil-fill"></i>
+                                                    </button>
+                                                    <div class="modal fade" id="editCityModal-${data.city.cod}" tabindex="-1" role="dialog"
+                                                        aria-labelledby="editCityModal-${data.city.cod}Label" aria-hidden="true">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="editCityModal-${data.city.cod}Label">Editar Ciudad</h5>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <form class="edit-city-form" method="POST" action="${editUrl.replace('0', data.city.cod)}"
+                                                                        id="editCityForm-${data.city.cod}">
+                                                                        <div class="form-group">
+                                                                            <label for="name">Nombre</label>
+                                                                            <input type="text" class="form-control" id="name" name="name"
+                                                                                value="${data.city.name}" required>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                                            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" class="btn btn-danger btn-md rounded-5" data-bs-toggle="modal"
+                                                        data-bs-target="#deleteCityModal-${data.city.cod}" title="Eliminar Ciudad">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                    <!-- Modal eliminar-->
+                                                    <div class="modal fade" id="deleteCityModal-${data.city.cod}" tabindex="-1" role="dialog"
+                                                        aria-labelledby="deleteCityModal-${data.city.cod}Label" aria-hidden="true">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="deleteCityModal-${data.city.cod}Label">Eliminar Ciudad</h5>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    ¿Seguro que desea eliminar esta ciudad?
+                                                                    <form class="delete-city-form" method="POST" action="${deleteUrl.replace('0', data.city.cod)}"
+                                                                        id="deleteCityForm-${data.city.cod}">
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                                            <button type="submit" class="btn btn-primary">Eliminar ciudad</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>`;
+                                        $('table tbody').append(newRow);
+                                    },
+                                    error: function () {
+                                        alert('Hubo un error al añadir la ciudad');
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <nav>
+            <ul class="pagination justify-content-center">
+                <!-- Botón de 'Anterior' -->
+                {% if cities.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('cities_list', page=cities.prev_num) }}">Anterior</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Anterior</a>
+                </li>
+                {% endif %}
+
+                <!-- Números de página -->
+                {% for page_num in cities.iter_pages() %}
+                {% if page_num %}
+                {% if page_num != cities.page %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('cities_list', page=page_num) }}">{{ page_num }}</a>
+                </li>
+                {% else %}
+                <li class="page-item active">
+                    <a class="page-link">{{ page_num }}</a>
+                </li>
+                {% endif %}
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">...</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                <!-- Botón de 'Siguiente' -->
+                {% if cities.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('cities_list', page=cities.next_num) }}">Siguiente</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link">Siguiente</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+</div>
+{% endblock %}

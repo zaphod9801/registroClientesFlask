@@ -9,5 +9,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
     os.path.join(basedir, 'app.db')
 db = SQLAlchemy(app)
 
-# Retrasar la importación de 'client'
+# Retrasar la importación de modulos
 client = import_module('Backend.controllers.client')
+city = import_module('Backend.controllers.city')

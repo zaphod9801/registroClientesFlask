@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify, url_for
-from Backend.models.models import City
+from Backend.models.models import City, Client
 from app import db, app
 
 
@@ -33,7 +33,24 @@ def cities_edit(cod):
 
 @app.route('/cities/<int:cod>/delete', methods=['POST'])
 def cities_delete(cod):
+    # El código de la ciudad predeterminada
+    default_city_cod = 0
+
+    # Verificar si la ciudad predeterminada existe
+    default_city = City.query.get(default_city_cod)
+    if default_city is None:
+        default_city = City(cod=default_city_cod, name="Sin ciudad")
+        db.session.add(default_city)
+        db.session.commit()
+
     city = City.query.get_or_404(cod)
+
+    # Reasignar todos los clientes de la ciudad a la ciudad predeterminada
+    Client.query.filter_by(city_cod=city.cod).update(
+        {Client.city_cod: default_city.cod}, synchronize_session='fetch')
+
+    # Después de reasignar todos los clientes, se puede eliminar la ciudad
     db.session.delete(city)
     db.session.commit()
+
     return jsonify({'message': 'Ciudad eliminada correctamente', 'city': city.to_dict()}), 200

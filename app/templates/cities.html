@@ -15,11 +15,11 @@
         </thead>
         <tbody id="listCities">
             {% for city in cities.items %}
+            {% if city.cod != 0 %}
             <tr id="city-{{ city.cod }}-details">
                 <td id="city-{{ city.cod }}-cod">{{ city.cod }}</td>
                 <td id="city-{{ city.cod }}-name">{{ city.name }}</td>
                 <td>
-                    <!-- Aquí vamos a poner los botones de editar y eliminar -->
                     <button type="button" class="btn btn-primary btn-md rounded-5" data-bs-toggle="modal"
                         data-bs-target="#editCityModal-{{ city.cod }}" title="Editar Ciudad">
                         <i class="bi bi-pencil-fill"></i>
@@ -81,6 +81,7 @@
                     </div>
                 </td>
             </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>

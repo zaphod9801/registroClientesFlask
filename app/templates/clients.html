@@ -5,6 +5,21 @@
     <h1 class="display-6">Lista de clientes</h1>
 </center>
 <div class="container-sm">
+    <form id="filter-form" method="GET" action="{{ url_for('clients_list') }}">
+        <select id="city-select" name="city_cod">
+            <option value="">Todas las ciudades</option>
+            {% for city in cities %}
+            <option value="{{ city.cod }}" {% if city.cod==current_city_cod %} selected {% endif %}>{{ city.name }}
+            </option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Filtrar">
+    </form>
+    <script>
+        document.getElementById('city-select').addEventListener('change', function () {
+            document.getElementById('filter-form').submit();
+        });
+    </script>
     <table id="clientsTable" class="table table-hover">
         <thead>
             <tr>
@@ -294,7 +309,8 @@
                 <!-- Botón de 'Anterior' -->
                 {% if clients.has_prev %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('clients_list', page=clients.prev_num) }}">Anterior</a>
+                    <a class="page-link"
+                        href="{{ url_for('clients_list', page=clients.prev_num, city_cod=current_city_cod) }}">Anterior</a>
                 </li>
                 {% else %}
                 <li class="page-item disabled">
@@ -307,7 +323,9 @@
                 {% if page_num %}
                 {% if page_num != clients.page %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('clients_list', page=page_num) }}">{{ page_num }}</a>
+                    <a class="page-link"
+                        href="{{ url_for('clients_list', page=page_num, city_cod=current_city_cod) }}">{{
+                        page_num }}</a>
                 </li>
                 {% else %}
                 <li class="page-item active">
@@ -324,7 +342,8 @@
                 <!-- Botón de 'Siguiente' -->
                 {% if clients.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('clients_list', page=clients.next_num) }}">Siguiente</a>
+                    <a class="page-link"
+                        href="{{ url_for('clients_list', page=clients.next_num, city_cod=current_city_cod) }}">Siguiente</a>
                 </li>
                 {% else %}
                 <li class="page-item disabled">
@@ -334,5 +353,6 @@
             </ul>
         </nav>
     </div>
+
 </div>
 {% endblock %}

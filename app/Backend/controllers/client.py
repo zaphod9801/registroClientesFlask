@@ -5,15 +5,24 @@ from app import db, app
 
 @app.route('/clients', methods=['GET'])
 def clients_list():
+    city_cod = request.args.get('city_cod', default=None, type=int)
+
     page = request.args.get('page', 1, type=int)
     per_page = 10
-    clients = db.session.query(Client).paginate(
-        page=page, per_page=per_page)
+    if city_cod is not None:
+        clients = db.session.query(Client).filter(Client.city_cod == city_cod).paginate(
+            page=page, per_page=per_page)
+    else:
+        clients = db.session.query(Client).paginate(
+            page=page, per_page=per_page)
+
     cities = list(map(lambda a: a.to_dict(), City.query.all()))
     city_dict = {city['cod']: city['name'] for city in cities}
+
     delete_url = url_for('clients_delete', cod=0)
     edit_url = url_for('clients_edit', cod=0)
-    return render_template('clients.html', clients=clients, cities=cities, city_dict=city_dict, delete_url=delete_url, edit_url=edit_url)
+
+    return render_template('clients.html', clients=clients, cities=cities, city_dict=city_dict, delete_url=delete_url, edit_url=edit_url, current_city_cod=city_cod)
 
 
 @app.route('/clients/create', methods=['POST'])

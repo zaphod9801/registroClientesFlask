@@ -5,7 +5,10 @@ from app import db, app
 
 @app.route('/clients', methods=['GET'])
 def clients_list():
-    clients = Client.query.all()
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    clients = db.session.query(Client).paginate(
+        page=page, per_page=per_page)
     cities = list(map(lambda a: a.to_dict(), City.query.all()))
     city_dict = {city['cod']: city['name'] for city in cities}
     delete_url = url_for('clients_delete', cod=0)

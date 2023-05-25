@@ -1,0 +1,68 @@
+<tr id="client-${data.client.cod}-details">
+    <td>${data.client.cod}</td>
+    <td id="client-${data.client.cod}-name">${data.client.name}</td>
+    <td id="client-${data.client.cod}-city_cod">${cityDict[data.client.city_cod]}</td>
+    <td>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#editClientModal-${data.client.cod}">
+            Editar Cliente
+        </button>
+        <div class="modal fade" id="editClientModal-${data.client.cod}" tabindex="-1" role="dialog"
+            aria-labelledby="editClientModal-${data.client.cod}Label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editClientModal-${data.client.cod}Label">Editar Cliente</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form class="edit-client-form" method="POST" action="${editUrl.replace('0', data.client.cod)}"
+                            id="editClientForm-${data.client.cod}">
+                            <div class="form-group">
+                                <label for="name">Nombre</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                    value="${data.client.name}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">Ciudad</label>
+                                <select class="form-control" id="city" name="city_cod">
+                                    ${cities}
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#deleteClientModal-${data.client.cod}">
+            Eliminar Cliente
+        </button>
+        <!-- Modal eliminar-->
+        <div class="modal fade" id="deleteClientModal-${data.client.cod}" tabindex="-1" role="dialog"
+            aria-labelledby="deleteClientModal-${data.client.cod}Label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteClientModal-${data.client.cod}Label">Eliminar Cliente</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form class="delete-client-form" method="POST"
+                            action="${deleteUrl.replace('0', data.client.cod)}"
+                            id="deleteClientForm-${data.client.cod}">
+                            hola
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">Eliminar usuario</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </td>
+</tr>

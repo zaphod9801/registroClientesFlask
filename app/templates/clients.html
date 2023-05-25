@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Lista de clientes</h1>
 
-<table>
+<table id="clientsTable">
     <thead>
         <tr>
             <th>Código</th>
@@ -11,31 +11,29 @@
             <th>Ciudad</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="listClients">
         {% for client in clients %}
-        <tr>
-            <td>{{ client.cod }}</td>
-            <td>{{ client.name }}</td>
-            <td>{{ client.city_cod }}</td>
+        <tr id="client-{{ client.cod }}-details">
+            <td id="client-{{ client.cod }}-cod">{{ client.cod }}</td>
+            <td id="client-{{ client.cod }}-name">{{ client.name }}</td>
+            <td id="client-{{ client.cod }}-city_cod">{{ city_dict[client.city_cod] }}</td>
             <td>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#{{loop.index}}editClientModal">
+                    data-bs-target="#editClientModal-{{client.cod}}">
                     Editar Cliente
                 </button>
-                <!-- Modal -->
-                <div class="modal fade" id="{{loop.index}}editClientModal" tabindex="-1" role="dialog"
-                    aria-labelledby="{{loop.index}}editClientModalLabel" aria-hidden="true">
+                <!-- Modal editar  -->
+                <div class="modal fade" id="editClientModal-{{client.cod}}" tabindex="-1" role="dialog"
+                    aria-labelledby="editClientModal-{{client.cod}}Label" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="{{loop.index}}editClientModalLabel">Editar Cliente</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <h5 class="modal-title" id="editClientModal-{{client.cod}}Label">Editar Cliente</h5>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="{{ url_for('clients_edit', cod=client.cod) }}"
-                                    id="editClientForm">
+                                <form class="edit-client-form" method="POST"
+                                    action="{{ url_for('clients_edit', cod=client.cod) }}"
+                                    id="editClientForm-{{ client.cod }}">
                                     <div class="form-group">
                                         <label for="name">Nombre</label>
                                         <input type="text" class="form-control" id="name" name="name"
@@ -51,44 +49,91 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
-                                            data-dismiss="modal">Cerrar</button>
+                                            data-bs-dismiss="modal">Cerrar</button>
                                         <button type="submit" class="btn btn-primary">Guardar cambios</button>
                                     </div>
                                 </form>
-                                <script>
-                                    $(document).ready(function () {
-                                        $("#editClientForm").submit(function (e) {
-                                            e.preventDefault();
-
-                                            var form = $(this);
-                                            var url = form.attr('action');
-
-                                            $.ajax({
-                                                type: "POST",
-                                                url: url,
-                                                data: form.serialize(),
-                                                success: function (data) {
-                                                    $('#{{loop.index}}editClientModal').modal('hide');
-                                                    // Actualiza la lista de clientes
-                                                    // Esto podría implicar volver a hacer una solicitud AJAX para obtener la lista actualizada de clientes
-                                                },
-                                                error: function () {
-                                                    alert('Hubo un error al editar el cliente');
-                                                }
-                                            });
-                                        });
-                                    });
-                                </script>
                             </div>
                         </div>
                     </div>
                 </div>
-                <form action="{{ url_for('clients_delete', cod=client.cod) }}" method="post">
-                    <button type="submit">Eliminar</button>
-                </form>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#deleteClientModal-{{client.cod}}">
+                    Eliminar Cliente
+                </button>
+                <!-- Modal eliminar-->
+                <div class="modal fade" id="deleteClientModal-{{client.cod}}" tabindex="-1" role="dialog"
+                    aria-labelledby="deleteClientModal-{{client.cod}}Label" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteClientModal-{{client.cod}}Label">Eliminar Cliente</h5>
+                            </div>
+                            <div class="modal-body">
+                                <form class="delete-client-form" method="POST"
+                                    action="{{ url_for('clients_delete', cod=client.cod) }}"
+                                    id="deleteClientForm-{{ client.cod }}">
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-primary">Eliminar usuario</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </td>
         </tr>
         {% endfor %}
+        <script>
+            $(document).on('submit', '.delete-client-form', function (e) {
+                e.preventDefault();
+
+                var form = $(this);
+                var url = form.attr('action');
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: form.serialize(),
+                    success: function (data) {
+                        $(`#deleteClientModal-${data.client.cod}`).modal('hide');
+                        $(`#client-${data.client.cod}-details`).remove()
+                    },
+                    error: function () {
+                        alert('Hubo un error al eliminar el cliente');
+                    }
+                });
+            });
+        </script>
+        <!-- Función para el modal para editar cliente-->
+        <script>
+            $(document).on('submit', '.edit-client-form', function (e) {
+                e.preventDefault();
+
+                var form = $(this);
+                var url = form.attr('action');
+                var cityDict = {{ city_dict | tojson | safe
+            }};
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: form.serialize(),
+                success: function (data) {
+                    $(`#editClientModal-${data.client.cod}`).modal('hide');
+                    $(`#client-${data.client.cod}-name`).text(data.client.name);
+                    $(`#client-${data.client.cod}-city_cod`).text(cityDict[data.client.city_cod]);
+                },
+                error: function () {
+                    alert('Hubo un error al editar el cliente');
+                }
+            });
+            });
+
+
+        </script>
 
         <!-- Botón para activar el modal -->
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#clientModal">
@@ -132,21 +177,92 @@
 
                                     var form = $(this);
                                     var url = form.attr('action');
+                                    var cities = {{ cities | tojson | safe
+                                }}.map(a => `<option value="${a.cod}">${a.name}</option>`);
+                            var cityDict = {{ city_dict | tojson | safe}};
 
-                                    $.ajax({
-                                        type: "POST",
-                                        url: url,
-                                        data: form.serialize(),
-                                        success: function (data) {
-                                            // Cierra el modal
-                                            $('#clientModal').modal('hide');
-                                            // Actualiza la lista de clientes
-                                            // Esto podría implicar volver a hacer una solicitud AJAX para obtener la lista actualizada de clientes
-                                        },
-                                        error: function () {
-                                            alert('Hubo un error al añadir el cliente');
-                                        }
-                                    });
+                            $.ajax({
+                                type: "POST",
+                                url: url,
+                                data: form.serialize(),
+                                success: function (data) {
+                                    // Cierra el modal
+                                    $('#clientModal').modal('hide');
+                                    var deleteUrl = "{{ delete_url }}";
+                                    var editUrl = "{{ edit_url }}";
+                                    // Actualiza la lista de clientes
+                                    // Aquí añadimos el nuevo cliente a la tabla
+                                    var newRow = `<tr id="client-${data.client.cod}-details">
+                                                    <td>${data.client.cod}</td>
+                                                    <td id="client-${data.client.cod}-name">${data.client.name}</td>
+                                                    <td id="client-${data.client.cod}-city_cod">${cityDict[data.client.city_cod]}</td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                            data-bs-target="#editClientModal-${data.client.cod}">
+                                                            Editar Cliente
+                                                        </button>
+                                                        <div class="modal fade" id="editClientModal-${data.client.cod}" tabindex="-1" role="dialog"
+                                                            aria-labelledby="editClientModal-${data.client.cod}Label" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="editClientModal-${data.client.cod}Label">Editar Cliente</h5>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <form class="edit-client-form" method="POST" action="${editUrl.replace('0', data.client.cod)}"
+                                                                            id="editClientForm-${data.client.cod}">
+                                                                            <div class="form-group">
+                                                                                <label for="name">Nombre</label>
+                                                                                <input type="text" class="form-control" id="name" name="name"
+                                                                                    value="${data.client.name}" required>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label for="city">Ciudad</label>
+                                                                                <select class="form-control" id="city" name="city_cod">
+                                                                                    ${cities}
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                                                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                            data-bs-target="#deleteClientModal-${data.client.cod}">
+                                                            Eliminar Cliente
+                                                        </button>
+                                                        <!-- Modal eliminar-->
+                                                        <div class="modal fade" id="deleteClientModal-${data.client.cod}" tabindex="-1" role="dialog"
+                                                            aria-labelledby="deleteClientModal-${data.client.cod}Label" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="deleteClientModal-${data.client.cod}Label">Eliminar Cliente</h5>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <form class="delete-client-form" method="POST" action="${deleteUrl.replace('0', data.client.cod)}"
+                                                                            id="deleteClientForm-${data.client.cod}">
+                                                                            <div class="modal-footer">
+                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                                                <button type="submit" class="btn btn-primary">Eliminar usuario</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>`;
+                                    $('table tbody').append(newRow);
+                                },
+                                error: function () {
+                                    alert('Hubo un error al añadir el cliente');
+                                }
+                            });
                                 });
                             });
                         </script>

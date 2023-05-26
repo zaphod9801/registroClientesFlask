@@ -69,17 +69,21 @@ pip install -e .
 ```
 This commands will install the libraries and dependecies of the project but also the project itself. 
 
-Before running the app, you must run the following command too:
-```bash
-python app/set_db.py
-```
+
 This command will create and populate a sqlite3 database, this is very important for the app usage. 
 
 Now as last step you must create a .env file inside the app folder like this:
 
 ![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/2c5132ab-3435-44d4-ad60-32662890f45f)
 
-Remember to change the JWT_SECRET_KEY with your desired value
+Remember to change the JWT_SECRET_KEY with your desired value.
+Before running the app, you must run the following command too:
+
+```bash
+
+python app/set_db.py
+
+```
 
 Now you can run the app just doing:
 ```bash

@@ -1,10 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, send_file, after_this_request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from Backend.models.models import Client, City
 from app import db, app
+import pandas as pd
+import tempfile
+import os
 
 
-@app.route('/clients', methods=['GET'])
+@app.route('/clients', methods=['GET'], endpoint='clients_list')
+@jwt_required()
 def clients_list():
+    current_user = get_jwt_identity()
     city_cod = request.args.get('city_cod', default=None, type=int)
 
     page = request.args.get('page', 1, type=int)
@@ -50,3 +56,33 @@ def clients_delete(cod):
     db.session.delete(client)
     db.session.commit()
     return jsonify({'message': 'Cliente eliminado correctamente', 'client': client.to_dict()}), 200
+
+
+@app.route('/export_clients', methods=['GET'])
+def export_clients():
+    city_cod = request.args.get('city_cod', default=None, type=int)
+
+    if city_cod is not None:
+        clients = Client.query.filter_by(city_cod=city_cod).all()
+    else:
+        clients = Client.query.all()
+
+    clients_dict = [client.to_dict() for client in clients]
+    df = pd.DataFrame(clients_dict)
+
+    # Crea un archivo temporal
+    temp = tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx')
+
+    try:
+        # Guarda el DataFrame en un archivo Excel
+        df.to_excel(temp.name, index=False)
+    except Exception as e:
+        os.remove(temp.name)
+        return jsonify({"error": str(e)}), 500
+
+    @after_this_request
+    def remove_file(response):
+        os.remove(temp.name)
+        return response
+
+    return send_file(temp.name, as_attachment=True, download_name='clients.xlsx')

@@ -6,14 +6,13 @@
 </center>
 <div class="container-sm">
     <form id="filter-form" method="GET" action="{{ url_for('clients_list') }}">
-        <select id="city-select" name="city_cod">
+        <select class="form-select mx-lg-5" id="city-select" name="city_cod">
             <option value="">Todas las ciudades</option>
             {% for city in cities %}
             <option value="{{ city.cod }}" {% if city.cod==current_city_cod %} selected {% endif %}>{{ city.name }}
             </option>
             {% endfor %}
         </select>
-        <input type="submit" value="Filtrar">
     </form>
     <script>
         document.getElementById('city-select').addEventListener('change', function () {
@@ -303,6 +302,13 @@
 
         </tbody>
     </table>
+    <form action="{{ url_for('export_clients') }}" method="get">
+        <input type="hidden" name="city_cod" value="{{ current_city_cod }}" />
+        <button type="submit" class="btn btn-primary btn-md rounded-3">
+            <i class="bi bi-file-earmark-excel"></i>
+            Exportar a Excel
+        </button>
+    </form>
     <div class="container">
         <nav>
             <ul class="pagination justify-content-center">

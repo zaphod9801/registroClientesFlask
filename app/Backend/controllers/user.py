@@ -1,7 +1,52 @@
-from flask import Flask, render_template, request, redirect, url_for
-from models.models import User
+from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies
+from Backend.models.models import User
 from app import db, app
 from werkzeug.security import generate_password_hash
+from flask_login import login_user, logout_user, login_required
+
+
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    error_message = None
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.get(username)
+        if user and user.check_password(password):
+            access_token = create_access_token(identity=username)
+            resp = make_response(redirect(url_for('clients_list')))
+            set_access_cookies(resp, access_token)
+            return resp
+        else:
+            error_message = "Credenciales inválidas"
+            return render_template('login.html', error_message=error_message)
+
+    else:  # si es una solicitud GET, renderiza la página de inicio de sesión
+        return render_template('login.html', error_message=error_message)
+
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    resp = make_response(redirect(url_for('login')))
+    unset_jwt_cookies(resp)
+    return resp
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        password = generate_password_hash(request.form.get('password'))
+        email = request.form.get('email')
+        new_user = User(name=name, password=password, email=email)
+        db.session.add(new_user)
+        db.session.commit()
+        access_token = create_access_token(identity=name)
+        resp = make_response(redirect(url_for('clients_list')))
+        set_access_cookies(resp, access_token)
+        return resp
+    return render_template('register.html')
 
 
 @app.route('/users', methods=['GET'])

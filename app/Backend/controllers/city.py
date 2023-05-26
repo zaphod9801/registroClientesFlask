@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request, jsonify, url_for
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from Backend.models.models import City, Client
 from app import db, app
 
 
-@app.route('/cities', methods=['GET'])
+@app.route('/cities', methods=['GET'], endpoint='cities_list')
+@jwt_required()
 def cities_list():
+    current_user = get_jwt_identity()
     page = request.args.get('page', 1, type=int)
     per_page = 10
     cities = db.session.query(City).paginate(page=page, per_page=per_page)

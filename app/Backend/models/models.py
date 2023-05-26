@@ -1,5 +1,6 @@
 from app import db
-
+from flask_login import UserMixin
+from werkzeug.security import check_password_hash
 
 class Client(db.Model):
     cod = db.Column(db.Integer, primary_key=True)
@@ -15,11 +16,14 @@ class Client(db.Model):
         return data
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     name = db.Column(db.String(50), primary_key=True)
     password = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     photo = db.Column(db.String(50), nullable=True)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
     def to_dict(self):
         data = {

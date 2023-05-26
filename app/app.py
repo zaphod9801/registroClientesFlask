@@ -12,7 +12,7 @@ load_dotenv()  # carga las variables de entorno desde .env
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-app.config["JWT_COOKIE_SECURE"] = False
+app.config["JWT_COOKIE_SECURE"] = True
 app.config["JWT_COOKIE_CSRF_PROTECT"] = True
 jwt = JWTManager(app)
 basedir = os.path.abspath(os.path.dirname(__file__))

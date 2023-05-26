@@ -25,13 +25,16 @@ The third endpoint was implemented but it is trickier to check, because it is a 
 First I recommend you to install something like postman to do this, you can check how to install it here: https://www.postman.com/downloads/
 
 Second, you have to go to modify something in the code, so go inside the app folder and there open the app.py folder. Here you have to change this line to "False":
+
 ![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/8293f115-6991-457b-950f-2d0b1bdd55c4)
 For default the app blocks any incoming content that use a cookie created in client-side. 
 Once you have done this you have to send a request like this:
+
 ![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/bf5143ad-9f94-4fd0-883c-f8a56d7c3d92)
 ![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/8c5aa84e-740c-491d-87fb-1085e6d15d5b)
 
 And now the third endpoint will give you the response:
+
 ![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/ca81766e-62fa-4484-b1bd-8f13aef949c8)
 
 

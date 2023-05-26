@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response
-from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies, jwt_required, get_jwt_identity
+from flask_restful import Api, Resource
 from Backend.models.models import User
 from app import db, app
 from werkzeug.security import generate_password_hash
-from flask_login import login_user, logout_user, login_required
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -90,3 +90,25 @@ def users_delete(name):
     db.session.delete(user)
     db.session.commit()
     return redirect(url_for('users_list'))
+
+
+api = Api(app)
+
+
+class UserInfo(Resource):
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+        user = User.query.get(current_user)
+        return {'name': user.name}, 200
+
+    @jwt_required()
+    def put(self):
+        current_user = get_jwt_identity()
+        user = User.query.get(current_user)
+        user.name = request.json.get('name', user.name)
+        db.session.commit()
+        return {'message': 'ok'}, 200
+
+
+api.add_resource(UserInfo, '/api/user/info')

@@ -7,6 +7,33 @@ You can also do the same CRUD operations for the cities:
 ![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/52f3778a-b2c7-4133-ae3f-60c63ba6ed71)
 It is important to say that any update that you make here will inmediately appear in your screen. 
 
+Also this app have the requirements to have this three endpoints:
+![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/196c69c1-23ad-4b4c-8680-11ad69a44282)
+![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/86c6cd52-ac08-4892-803a-4e0590d42d92)
+
+The first endpoint was used to built the login and authentication system, as the requirement, it uses a jwt with extra security like saving it on cookies, 
+using secure cookies and using a csfr token, you can see an example here:
+![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/19e4d1d5-cb8a-42bc-b17e-14f90ae9cce4)
+You can view this information in your browser developer tools, in storage section.
+
+The second endpoint was used as get endpoint you can check on the browser after you logged in, you just have to go to localhost:5000/api/user/info and you will
+see something like this:
+![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/776421a4-4512-4600-8ae3-bb5672f5f042)
+
+The third endpoint was implemented but it is trickier to check, because it is a put endpoint and need the security requirements.
+First I recommend you to install something like postman to do this, you can check how to install it here: https://www.postman.com/downloads/
+
+Second, you have to go to modify something in the code, so go inside the app folder and there open the app.py folder. Here you have to change this line to "False":
+![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/8293f115-6991-457b-950f-2d0b1bdd55c4)
+For default the app blocks any incoming content that use a cookie created in client-side. 
+Once you have done this you have to send a request like this:
+![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/bf5143ad-9f94-4fd0-883c-f8a56d7c3d92)
+![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/8c5aa84e-740c-491d-87fb-1085e6d15d5b)
+
+And now the third endpoint will give you the response:
+![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/ca81766e-62fa-4484-b1bd-8f13aef949c8)
+
+
 ## Quickstart Guide
 In order to install and run this project you must first clone this repository inside any folder on your personal computer and navigate into that folder. 
 Once you have done this, there are two methods to install and run the app, I will explain them as follow:

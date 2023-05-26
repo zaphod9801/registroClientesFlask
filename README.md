@@ -18,6 +18,7 @@ You can view this information in your browser developer tools, in storage sectio
 
 The second endpoint was used as get endpoint you can check on the browser after you logged in, you just have to go to localhost:5000/api/user/info and you will
 see something like this:
+
 ![image](https://github.com/zaphod9801/registroClientesFlask/assets/71454879/776421a4-4512-4600-8ae3-bb5672f5f042)
 
 The third endpoint was implemented but it is trickier to check, because it is a put endpoint and need the security requirements.

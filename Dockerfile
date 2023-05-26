@@ -22,7 +22,7 @@ RUN pip install -e .
 WORKDIR /app/app
 
 # Create the database tables and seed data
-RUN python setDB.py
+RUN python set_db.py
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000

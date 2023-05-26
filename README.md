@@ -71,7 +71,7 @@ This commands will install the libraries and dependecies of the project but also
 
 Before running the app, you must run the following command too:
 ```bash
-python app/setDB.py
+python app/set_db.py
 ```
 This command will create and populate a sqlite3 database, this is very important for the app usage. 
 

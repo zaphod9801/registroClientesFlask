@@ -15,12 +15,12 @@ Once you have done this, there are two methods to install and run the app, I wil
 This method have as a requisite to have Docker installed on your computer, you can check it out how to it here: https://docs.docker.com/engine/
 Once you have Docker installed, you just have to run the following two commands (you MUST run them on the project root folder)
 
-```console
+```bash
 docker build -t registro-clientes-app .
 ```
 This command will build the docker image of the app with the specifications contained in the Dcokerfile
 
-```console
+```bash
 docker run -p 5000:5000 registro-clientes-appp
 ```
 
@@ -32,20 +32,20 @@ localhost:5000/ and you should saw the app login screen, there you can go to reg
 You can also install and run the app on your own machine, as a recommendation, you should have installed virtualenv on your machine, you can check out the installation and setup
 here: https://virtualenv.pypa.io/en/latest/installation.html
 Once you are here, you have to run the following commands on your terminal:
-```console
+```bash
 pip install -r requirements.txt
 pip install -e .
 ```
 This commands will install the libraries and dependecies of the project but also the project itself. 
 
 Before running the app, you must run the following command too:
-```console
+```bash
 python app/setDB.py
 ```
 This command will create and populate a sqlite3 database, this is very important for the app usage. 
 
 Now you can run the app just doing:
-```console
+```bash
 python app/run.py
 ```
 And again you just have to go to localhost:5000/ and you will see the login screen.
